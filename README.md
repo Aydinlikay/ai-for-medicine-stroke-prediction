@@ -30,17 +30,26 @@ forces every modelling choice to defend itself against label noise.
 
 Held-out test-set metrics (from `outputs/test_metrics.csv`):
 
-| Model | ROC-AUC | PR-AUC | Recall | Precision | F1 |
-|---|---:|---:|---:|---:|---:|
-| **LogisticRegression** | **0.8423** | **0.2648** | 0.80 | 0.138 | 0.236 |
-| XGBoost | 0.8394 | 0.2507 | 0.78 | 0.155 | 0.258 |
-| RandomForest | 0.8226 | 0.2359 | 0.76 | 0.135 | 0.230 |
-| SVM | 0.8095 | 0.1749 | 0.78 | 0.133 | 0.227 |
+| Model | ROC-AUC | PR-AUC | Sensitivity | Specificity | FPR | FNR | Precision | F1 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| **LogisticRegression** | **0.8423** | 0.2648 | **0.80** | 0.744 | 0.256 | 0.20 | 0.138 | 0.236 |
+| XGBoost | 0.8422 | **0.2689** | 0.78 | **0.784** | **0.216** | 0.22 | **0.157** | **0.261** |
+| RandomForest | 0.8226 | 0.2359 | 0.76 | 0.750 | 0.250 | 0.24 | 0.135 | 0.230 |
+| SVM | 0.8095 | 0.1749 | 0.78 | 0.739 | 0.261 | 0.22 | 0.133 | 0.227 |
 
-The simplest model wins. Age dominates every classifier; average glucose level,
-hypertension and heart-disease flags follow. The low absolute precision is the
-intended trade-off for a screening tool — see the report's discussion for the
-clinical reasoning.
+LogisticRegression and XGBoost are tied on ROC-AUC (within the ≈0.01 noise
+band documented in the report). LogReg has the higher sensitivity (0.80 vs
+0.78), XGBoost has the better specificity, PR-AUC and F1 — i.e. it catches
+slightly fewer strokes but raises noticeably fewer false alarms. Either choice
+is defensible depending on the desired operating point.
+
+Raw confusion-matrix counts per model are also exported to
+`outputs/test_confusion_counts.csv` for full transparency.
+
+Age dominates every classifier; average glucose level, hypertension and
+heart-disease flags follow. The low absolute precision is the intended
+trade-off for a screening tool — see the report's discussion for the clinical
+reasoning.
 
 All figures referenced in the report (`Doc/AI_for_Medicine_Project_Filled.docx`)
 are produced by the notebook and live in `outputs/`:
@@ -53,10 +62,11 @@ outputs/
 ├── correlation_heatmap.png
 ├── roc_curves.png              # all four models, one axis
 ├── pr_curves.png               # honest view under imbalance
-├── confusion_matrices.png
+├── confusion_matrices.png      # row-normalised: (Specificity, Sensitivity) on the diagonal
 ├── feature_importances.png     # RF + XGBoost
 ├── logreg_coefficients.png     # standardised, clinically readable
-└── test_metrics.csv
+├── test_metrics.csv            # ROC-AUC, PR-AUC, Sensitivity, Specificity, FPR, FNR, Precision, F1
+└── test_confusion_counts.csv   # raw TN / FP / FN / TP per model
 ```
 
 ## Layout
